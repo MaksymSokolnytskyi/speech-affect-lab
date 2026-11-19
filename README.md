@@ -1,44 +1,49 @@
 # speech-affect-lab
 
-Speaker-independent speech emotion recognition with **frozen** self-supervised encoders
-(WavLM Base+, HuBERT Base) and a linear probe — validated without speaker leakage, stress-tested
-on a simulated telephone channel with noise, compressed for CPU inference (ONNX, layer
-truncation, int8), and analysed geometrically (CKA, Procrustes, Grassmann distances,
-Fisher–LDA).
+Speech emotion recognition with frozen self-supervised encoders (WavLM Base+, HuBERT Base)
+and a linear classifier. The project checks how much emotion such an encoder exposes on
+speakers it has never seen, how much survives a simulated telephone line with noise, what ONNX
+export, layer truncation and int8 quantisation give on a CPU, and how the two encoders
+organise emotion geometrically (CKA, Procrustes, Grassmann distances, Fisher-LDA).
 
-**Full write-up:** [report/report.pdf](report/report.pdf) (11 pages, figures, method, limitations).
+The full write-up is in [report/report.pdf](report/report.pdf) (11 pages).
 
 | | |
 |---|---|
 | ![UAR by layer](report/figures/layers.png) | ![Telephone channel](report/figures/channel.png) |
 
-## Findings at a glance
+## Main findings
 
-1. **A frozen WavLM + logistic regression is a strong baseline.** On speakers never seen in
-   training, UAR is 0.75 (chance 0.17), 23 pp above the classical eGeMAPS features under the
-   identical protocol. WavLM beats HuBERT by 3.7 pp.
-2. **Emotion lives in the middle layers** (WavLM: 5–8; the inner CV picked layer 6 or 7 in every
-   fold). The last layer is worse.
-3. **Speaker leakage is real but small for a linear probe** (1.6–2.0 pp), because strong
-   regularisation stops it memorising voices. Speaker-disjoint splits remain mandatory.
-4. **The telephone channel is the main threat**: band limiting and μ-law alone cost 11 pp
-   (WavLM) and 22 pp (HuBERT); with 5 dB noise, a third of the quality or more.
-   **Augmenting only the probe recovers 7–17 pp** at a cost of 2 pp on clean audio.
-5. **On this CPU, truncation beats quantisation.** Cutting the encoder after layer 7 (from the
-   layer analysis) gives 1.35× with no quality loss; dynamic int8 gives only 1.15× and fails
-   both pre-registered criteria, because the convolutional front-end (≈50% of run time) stays
-   in fp32. PyTorch → ONNX + truncation + int8: 1.8× faster, 4.4× smaller.
-6. **Both encoders put emotion in nearly the same subspace** (Grassmann distance after a
-   Procrustes rotation close to the split-half noise floor, far from random). WavLM's advantage
-   comes from the *shape* of the within-class scatter: the Fisher–LDA criterion tracks the
-   layer-wise UAR (r = 0.92 / 0.97), whereas the Euclidean between/within ratio does not.
+1. On speakers never seen in training, a frozen WavLM with logistic regression reaches a UAR
+   of 0.75 (chance 0.17). That is 23 pp more than the eGeMAPS features evaluated with the same
+   protocol, and 3.7 pp more than HuBERT.
+2. Emotion is easiest to read out in the middle layers. For WavLM the curve peaks at layers
+   5 to 8, the inner cross-validation picked layer 6 or 7 in every fold, and the last layer is
+   worse.
+3. Speaker leakage is real but small for a linear classifier (1.6 to 2.0 pp), since strong
+   regularisation keeps it from memorising voices. Speaker-disjoint splits are still needed.
+4. The telephone channel is the biggest problem. Band limiting and μ-law alone cost 11 pp with
+   WavLM and 22 pp with HuBERT; with noise at 5 dB, a third of the quality or more is lost.
+   Training the classifier on augmented audio brings back 7 to 17 pp and costs 2 pp on clean
+   audio.
+5. On this CPU, truncation helps more than quantisation. Cutting the encoder after layer 7
+   gives 1.35x with no loss in quality. Dynamic int8 gives only 1.15x and misses both
+   pre-registered criteria, because the convolutional front-end, about half of the run time,
+   stays in fp32. ONNX, truncation and int8 together: 1.8x faster, and 82 MB instead of
+   361 MB.
+6. Both encoders put the emotion class means in nearly the same subspace: after a Procrustes
+   rotation, the Grassmann distance between them is close to the split-half noise level and far
+   from random. WavLM is better because of the shape of the scatter around the means. The
+   Fisher-LDA criterion follows the layer-wise UAR (r = 0.92 for WavLM, 0.97 for HuBERT); the
+   Euclidean between/within ratio does not.
 
-Success criteria were fixed **before** the runs ([docs/PREREGISTRATION.md](docs/PREREGISTRATION.md));
-two of them (int8) are not met and are reported as such.
+The success criteria were written down before the experiments were run
+([docs/PREREGISTRATION.md](docs/PREREGISTRATION.md)). Two of them, both about int8, are not met,
+and the tables say so.
 
 ## Results
 
-Generated from the run logs by `experiments/make_report.py` — no number below is typed by hand.
+The tables below are generated from the run logs by `experiments/make_report.py`.
 
 <!-- RESULTS -->
 ### Success criteria (pre-registered in docs/PREREGISTRATION.md)
@@ -231,11 +236,11 @@ git-ignored).
 
 ## Caveats
 
-- **Acted emotions are not real calls.** Actors read 12 fixed sentences with often exaggerated
+- Acted emotions are not real calls. Actors read 12 fixed sentences with often exaggerated
   portrayals in a studio. The numbers compare methods; they are not clinical accuracy.
-- **Labels are noisy.** The audio-only listener majority matches the intended emotion in only
+- The labels are noisy. The audio-only listener majority matches the intended emotion in only
   45.6% of the clips without a tied vote.
-- **The channel simulation is simplified:** continuous μ-law instead of table-based G.711, no
+- The channel simulation is simplified: continuous μ-law instead of table-based G.711, no
   mobile codecs (AMR, Opus), packet loss or echo.
 - Latency was measured on one laptop CPU; server CPUs with VNNI usually gain more from int8.
 - Bootstrap intervals cover test-speaker variability, not training randomness.
