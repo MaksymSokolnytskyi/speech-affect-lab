@@ -1,5 +1,7 @@
 # speech-affect-lab
 
+[![CI](https://github.com/MaksymSokolnytskyi/speech-affect-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/MaksymSokolnytskyi/speech-affect-lab/actions/workflows/ci.yml)
+
 Speech emotion recognition with frozen self-supervised encoders (WavLM Base+, HuBERT Base)
 and a linear classifier. The project checks how much emotion such an encoder exposes on
 speakers it has never seen, how much survives a simulated telephone line with noise, what ONNX
