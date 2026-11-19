@@ -207,11 +207,22 @@ tests/                 unit tests (fast by default); data/model tests behind mar
 
 ## Reproduce
 
-Requires Python 3.12 and [uv](https://docs.astral.sh/uv/). A CUDA GPU makes feature extraction
-fast (~4 min per model and condition) but is not required.
+Requires Python 3.12 and [uv](https://docs.astral.sh/uv/). PyTorch comes as one of two
+mutually exclusive extras; pick the one that matches your machine:
 
 ```bash
-uv sync
+uv sync --extra cpu --extra egemaps      # CPU only: Linux, Windows, macOS (Apple Silicon included)
+```
+
+```bash
+uv sync --extra cu130 --extra egemaps    # NVIDIA GPU, CUDA 13.0 build (Linux, Windows)
+```
+
+`uv sync` installs exactly the extras you name, so pass the same ones on every later sync. A CUDA
+GPU makes feature extraction fast (~4 min per model and condition) but is not required; the
+`egemaps` extra (openSMILE) is only needed for the eGeMAPS baseline.
+
+```bash
 uv run python -m speech_affect.data.cremad download      # ~0.6 GB, hash-verified
 uv run python -m speech_affect.data.cremad manifest
 uv run python -m speech_affect.channel.noise download    # MUSAN noise/, ~0.6 GB
@@ -221,7 +232,7 @@ uv run python experiments/exp01_emotion_probe.py
 uv run python experiments/exp02_telephone.py
 uv run python experiments/exp03_compression.py --model wavlm
 uv run python experiments/exp03b_profile.py
-uv sync --extra egemaps && uv run python -m speech_affect.features.egemaps
+uv run python -m speech_affect.features.egemaps
 uv run python experiments/exp04_egemaps_baseline.py
 uv run python experiments/exp05_representations.py
 uv run python experiments/make_figures.py && uv run python experiments/make_report.py
