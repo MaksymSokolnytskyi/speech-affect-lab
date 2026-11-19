@@ -79,7 +79,7 @@ regression on mean-pooled hidden states reaches an unweighted average recall (UA
 (chance 0.167). That is 23\pp{} above the eGeMAPS feature set evaluated with the same protocol.
 Emotion is most accessible in layers 6 and 7. A simulated narrow-band telephone channel costs
 11\pp{} with WavLM and 22\pp{} with HuBERT, and adding noise at 5\,dB SNR costs up to 43\pp;
-training the classifier on channel-and-noise augmented audio recovers most of the loss. On a
+training the classifier on channel-and-noise augmented audio recovers half or more of the loss. On a
 laptop CPU, ONNX export, truncation after layer 7 and int8 quantisation together make the
 encoder 1.8 times faster and 4.4 times smaller than the full fp32 model. Quantisation on its own falls short of its
 pre-registered target (1.15 times faster instead of 1.5), because the convolutional front-end,
@@ -551,7 +551,7 @@ spontaneous, non-English telephone speech.
 A frozen WavLM Base+ with a linear classifier recognises six acted emotions on unseen speakers
 with a UAR of 0.75, well above hand-designed acoustic features, and the information is
 concentrated in the middle layers. The telephone channel is the largest source of degradation,
-and augmenting the classifier's training data recovers most of it. For CPU inference on this
+and augmenting the classifier's training data recovers half or more of the loss. For CPU inference on this
 hardware, truncating the encoder at the layer found by the analysis is worth more than int8
 quantisation. Two differently trained encoders store emotion in nearly the same subspace; what
 makes one of them better is the shape of the scatter around the class means.
