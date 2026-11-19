@@ -1,0 +1,64 @@
+[project]
+name = "speech-affect-lab"
+version = "0.1.0"
+description = "Speech emotion recognition with WavLM/HuBERT: speaker-independent validation, telephone channel robustness, CPU compression"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "torch==2.14.1",
+    "transformers>=4.46",
+    "numpy>=2.0",
+    "scipy>=1.13",
+    "pandas>=2.2",
+    "pyarrow>=17",  # Parquet engine for pandas (manifest, predictions)
+    "soundfile>=0.12",
+    "scikit-learn>=1.5",
+    "joblib>=1.4",
+    "pydantic>=2.7",
+    "matplotlib>=3.9",
+    "tqdm>=4.66",
+    "onnx>=1.17",
+    "onnxruntime>=1.20",
+    "onnxscript>=0.1",  # required by torch.onnx.export(dynamo=True)
+]
+
+[project.optional-dependencies]
+egemaps = ["opensmile>=2.6.0"]  # eGeMAPS baseline (features/egemaps.py, exp04)
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "ruff>=0.7",
+]
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu130" }
+
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/speech_affect"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests", "experiments"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "NPY", "RUF"]
+ignore = ["RUF001"]  # typographic symbols in plot labels (multiplication sign, en dash) are deliberate
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-m 'not slow and not data'"
+markers = [
+    "data: needs the downloaded dataset and manifest (data/)",
+    "slow: long-running (downloads and runs the pretrained encoders)",
+]

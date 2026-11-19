@@ -1,0 +1,40 @@
+# Data, caches and run artifacts are never committed (anchored to the repo root,
+# so the package `src/speech_affect/data/` is NOT ignored).
+/data/
+/outputs/
+*.wav
+*.flac
+*.mp3
+*.npz
+*.onnx
+*.parquet
+
+# Local, non-public notes
+/_local_uk/
+
+# LaTeX build files (the compiled report/report.pdf is committed)
+report/*.aux
+report/*.log
+report/*.out
+report/*.toc
+report/*.bbl
+report/*.blg
+report/*.fls
+report/*.fdb_latexmk
+report/*.synctex.gz
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
