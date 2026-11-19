@@ -207,7 +207,7 @@ tests/                 unit tests (fast by default); data/model tests behind mar
 
 ## Reproduce
 
-Requires Python 3.11+ and [uv](https://docs.astral.sh/uv/). A CUDA GPU makes feature extraction
+Requires Python 3.12 and [uv](https://docs.astral.sh/uv/). A CUDA GPU makes feature extraction
 fast (~4 min per model and condition) but is not required.
 
 ```bash
@@ -244,3 +244,15 @@ git-ignored).
   mobile codecs (AMR, Opus), packet loss or echo.
 - Latency was measured on one laptop CPU; server CPUs with VNNI usually gain more from int8.
 - Bootstrap intervals cover test-speaker variability, not training randomness.
+
+## Licence
+
+The code, documentation and report in this repository are released under the
+[MIT licence](LICENSE).
+
+The data are not part of the repository and keep their own licences: CREMA-D is under the Open
+Database License 1.0 and the Database Contents License 1.0, and MUSAN under CC BY 4.0 with
+per-file licences for the noise recordings (details in [docs/DATA.md](docs/DATA.md)). The
+pretrained WavLM and HuBERT checkpoints are downloaded from Hugging Face and are covered by the
+licences published with them. If you use the data, please cite the original papers listed in
+the report.

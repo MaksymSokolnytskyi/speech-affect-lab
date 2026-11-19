@@ -3,6 +3,9 @@ name = "speech-affect-lab"
 version = "0.1.0"
 description = "Speech emotion recognition with WavLM/HuBERT: speaker-independent validation, telephone channel robustness, CPU compression"
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Maksym Sokolnytskyi" }]
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "torch==2.14.1",
